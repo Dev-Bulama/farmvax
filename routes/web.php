@@ -3,10 +3,16 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\SettingsController;
+use App\Http\Controllers\Admin\UserManagementController;
+use App\Http\Controllers\Admin\AdsController;
+use App\Http\Controllers\Admin\OutbreakAlertController;
+use App\Http\Controllers\Admin\BulkMessageController;
 use App\Http\Controllers\Individual\DashboardController as IndividualDashboardController;
 use App\Http\Controllers\Professional\DashboardController as ProfessionalDashboardController;
 use App\Http\Controllers\Volunteer\DashboardController as VolunteerDashboardController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Api\LocationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -41,10 +47,68 @@ Route::get('/register', function () {
 |--------------------------------------------------------------------------
 */
 
+/*
+|--------------------------------------------------------------------------
+| API Routes (for AJAX calls)
+|--------------------------------------------------------------------------
+*/
+Route::prefix('api')->name('api.')->group(function () {
+    Route::get('/countries', [LocationController::class, 'countries'])->name('countries');
+    Route::get('/states/{countryId?}', [LocationController::class, 'states'])->name('states');
+    Route::get('/lgas/{stateId?}', [LocationController::class, 'lgas'])->name('lgas');
+    Route::post('/detect-location', [LocationController::class, 'detectLocation'])->name('detect-location');
+    Route::get('/locations/search', [LocationController::class, 'search'])->name('locations.search');
+});
+
+/*
+|--------------------------------------------------------------------------
+| Admin Routes
+|--------------------------------------------------------------------------
+*/
+
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     // Dashboard
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
-    
+
+    // Settings
+    Route::get('/settings', [SettingsController::class, 'index'])->name('settings');
+    Route::get('/settings/general', [SettingsController::class, 'general'])->name('settings.general');
+    Route::post('/settings/general', [SettingsController::class, 'updateGeneral'])->name('settings.general.update');
+    Route::get('/settings/email', [SettingsController::class, 'email'])->name('settings.email');
+    Route::post('/settings/email', [SettingsController::class, 'updateEmail'])->name('settings.email.update');
+    Route::get('/settings/sms', [SettingsController::class, 'sms'])->name('settings.sms');
+    Route::post('/settings/sms', [SettingsController::class, 'updateSms'])->name('settings.sms.update');
+    Route::get('/settings/ai', [SettingsController::class, 'ai'])->name('settings.ai');
+    Route::post('/settings/ai', [SettingsController::class, 'updateAi'])->name('settings.ai.update');
+    Route::get('/settings/professional', [SettingsController::class, 'professional'])->name('settings.professional');
+    Route::post('/settings/professional-types', [SettingsController::class, 'storeProfessionalType'])->name('settings.professional-types.store');
+    Route::post('/settings/specializations', [SettingsController::class, 'storeSpecialization'])->name('settings.specializations.store');
+    Route::post('/settings/service-areas', [SettingsController::class, 'storeServiceArea'])->name('settings.service-areas.store');
+    Route::delete('/settings/professional-types/{id}', [SettingsController::class, 'deleteProfessionalType'])->name('settings.professional-types.delete');
+    Route::delete('/settings/specializations/{id}', [SettingsController::class, 'deleteSpecialization'])->name('settings.specializations.delete');
+    Route::delete('/settings/service-areas/{id}', [SettingsController::class, 'deleteServiceArea'])->name('settings.service-areas.delete');
+
+    // User Management
+    Route::get('/users', [UserManagementController::class, 'index'])->name('users');
+    Route::get('/users/create', [UserManagementController::class, 'create'])->name('users.create');
+    Route::post('/users', [UserManagementController::class, 'store'])->name('users.store');
+    Route::post('/users/bulk-action', [UserManagementController::class, 'bulkAction'])->name('users.bulk-action');
+    Route::post('/users/{id}/deactivate', [UserManagementController::class, 'deactivate'])->name('users.deactivate');
+    Route::post('/users/{id}/ban', [UserManagementController::class, 'ban'])->name('users.ban');
+
+    // Ads Management
+    Route::resource('ads', AdsController::class);
+    Route::get('/ads/{id}/analytics', [AdsController::class, 'analytics'])->name('ads.analytics');
+
+    // Outbreak Alerts
+    Route::resource('outbreak-alerts', OutbreakAlertController::class);
+    Route::get('/outbreak-alerts/{id}/notifications', [OutbreakAlertController::class, 'notifications'])->name('outbreak-alerts.notifications');
+
+    // Bulk Messages
+    Route::resource('bulk-messages', BulkMessageController::class);
+    Route::post('/bulk-messages/{id}/send', [BulkMessageController::class, 'send'])->name('bulk-messages.send');
+    Route::get('/bulk-messages/{id}/logs', [BulkMessageController::class, 'logs'])->name('bulk-messages.logs');
+
     // Farmers
     Route::get('/farmers', [AdminDashboardController::class, 'farmers'])->name('farmers');
     

@@ -5,6 +5,9 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\AnimalHealthProfessional;
+use App\Models\Volunteer;
+use Illuminate\Support\Facades\Hash;
 
 class UserManagementController extends Controller
 {
@@ -13,16 +16,19 @@ class UserManagementController extends Controller
      */
     public function index(Request $request)
     {
-        $query = User::query();
+        $query = User::with(['state', 'lga']);
 
         // Filter by role
         if ($request->filled('role')) {
             $query->where('role', $request->role);
         }
 
-        // Filter by status
+        // Filter by status (account_status for new field, status for legacy)
         if ($request->filled('status')) {
-            $query->where('status', $request->status);
+            $query->where(function($q) use ($request) {
+                $q->where('status', $request->status)
+                  ->orWhere('account_status', $request->status);
+            });
         }
 
         // Search
@@ -37,7 +43,16 @@ class UserManagementController extends Controller
 
         $users = $query->latest()->paginate(20);
 
-        return view('admin.users.index', compact('users'));
+        $stats = [
+            'total' => User::count(),
+            'farmers' => User::where('role', 'farmer')->count(),
+            'professionals' => User::where('role', 'animal_health_professional')->count(),
+            'volunteers' => User::where('role', 'volunteer')->count(),
+            'active' => User::where('account_status', 'active')->count(),
+            'suspended' => User::where('account_status', 'suspended')->count(),
+        ];
+
+        return view('admin.users.index', compact('users', 'stats'));
     }
 
     /**
@@ -112,5 +127,112 @@ class UserManagementController extends Controller
 
         return redirect()->route('admin.users.index')
             ->with('success', 'User deleted successfully!');
+    }
+
+    /**
+     * Deactivate a user
+     */
+    public function deactivate($id)
+    {
+        $user = User::findOrFail($id);
+
+        if ($user->role === 'admin') {
+            return back()->with('error', 'Cannot deactivate admin users!');
+        }
+
+        $user->update(['account_status' => 'deactivated']);
+
+        return back()->with('success', 'User deactivated successfully!');
+    }
+
+    /**
+     * Ban a user
+     */
+    public function ban($id)
+    {
+        $user = User::findOrFail($id);
+
+        if ($user->role === 'admin') {
+            return back()->with('error', 'Cannot ban admin users!');
+        }
+
+        $user->update(['account_status' => 'banned']);
+
+        return back()->with('success', 'User banned successfully!');
+    }
+
+    /**
+     * Bulk actions on users
+     */
+    public function bulkAction(Request $request)
+    {
+        $validated = $request->validate([
+            'action' => 'required|in:activate,suspend,deactivate,ban,delete',
+            'user_ids' => 'required|array',
+            'user_ids.*' => 'exists:users,id',
+        ]);
+
+        $users = User::whereIn('id', $validated['user_ids'])->get();
+
+        foreach ($users as $user) {
+            // Skip admins for safety
+            if ($user->role === 'admin') {
+                continue;
+            }
+
+            switch ($validated['action']) {
+                case 'activate':
+                    $user->update(['account_status' => 'active']);
+                    break;
+                case 'suspend':
+                    $user->update(['account_status' => 'suspended']);
+                    break;
+                case 'deactivate':
+                    $user->update(['account_status' => 'deactivated']);
+                    break;
+                case 'ban':
+                    $user->update(['account_status' => 'banned']);
+                    break;
+                case 'delete':
+                    $user->delete();
+                    break;
+            }
+        }
+
+        return back()->with('success', 'Bulk action completed successfully');
+    }
+
+    /**
+     * Create new user
+     */
+    public function create()
+    {
+        return view('admin.users.create');
+    }
+
+    /**
+     * Store new user
+     */
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users',
+            'phone' => 'required|string',
+            'password' => 'required|string|min:8',
+            'role' => 'required|in:admin,farmer,animal_health_professional,volunteer',
+            'address' => 'nullable|string',
+            'state_id' => 'nullable|exists:states,id',
+            'lga_id' => 'nullable|exists:lgas,id',
+        ]);
+
+        $validated['password'] = Hash::make($validated['password']);
+        $validated['account_status'] = 'active';
+        $validated['status'] = 'active';
+
+        User::create($validated);
+
+        return redirect()->route('admin.users.index')
+            ->with('success', 'User created successfully');
     }
 }
