@@ -79,6 +79,17 @@ Route::prefix('api')->name('api.')->group(function () {
 
 /*
 |--------------------------------------------------------------------------
+| Chat Web Interface (All Authenticated Users)
+|--------------------------------------------------------------------------
+*/
+Route::middleware('auth')->group(function () {
+    Route::get('/chat', function() {
+        return view('chat.index');
+    })->name('chat.interface');
+});
+
+/*
+|--------------------------------------------------------------------------
 | Admin Routes
 |--------------------------------------------------------------------------
 */
@@ -88,16 +99,15 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
 
     // Settings
-    Route::get('/settings', [SettingsController::class, 'index'])->name('settings');
-    Route::get('/settings/general', [SettingsController::class, 'general'])->name('settings.general');
-    Route::post('/settings/general', [SettingsController::class, 'updateGeneral'])->name('settings.general.update');
+    Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index');
+    Route::put('/settings', [SettingsController::class, 'update'])->name('settings.update');
     Route::get('/settings/email', [SettingsController::class, 'email'])->name('settings.email');
-    Route::post('/settings/email', [SettingsController::class, 'updateEmail'])->name('settings.email.update');
+    Route::put('/settings/email', [SettingsController::class, 'updateEmail'])->name('settings.email.update');
     Route::get('/settings/sms', [SettingsController::class, 'sms'])->name('settings.sms');
-    Route::post('/settings/sms', [SettingsController::class, 'updateSms'])->name('settings.sms.update');
+    Route::put('/settings/sms', [SettingsController::class, 'updateSms'])->name('settings.sms.update');
     Route::get('/settings/ai', [SettingsController::class, 'ai'])->name('settings.ai');
-    Route::post('/settings/ai', [SettingsController::class, 'updateAi'])->name('settings.ai.update');
-    Route::get('/settings/professional', [SettingsController::class, 'professional'])->name('settings.professional');
+    Route::put('/settings/ai', [SettingsController::class, 'updateAi'])->name('settings.ai.update');
+    Route::get('/settings/professional-types', [SettingsController::class, 'professionalTypes'])->name('settings.professional-types');
     Route::post('/settings/professional-types', [SettingsController::class, 'storeProfessionalType'])->name('settings.professional-types.store');
     Route::post('/settings/specializations', [SettingsController::class, 'storeSpecialization'])->name('settings.specializations.store');
     Route::post('/settings/service-areas', [SettingsController::class, 'storeServiceArea'])->name('settings.service-areas.store');
@@ -106,11 +116,16 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::delete('/settings/service-areas/{id}', [SettingsController::class, 'deleteServiceArea'])->name('settings.service-areas.delete');
 
     // User Management
-    Route::get('/users', [UserManagementController::class, 'index'])->name('users');
+    Route::get('/users', [UserManagementController::class, 'index'])->name('users.index');
     Route::get('/users/create', [UserManagementController::class, 'create'])->name('users.create');
     Route::post('/users', [UserManagementController::class, 'store'])->name('users.store');
+    Route::get('/users/{id}/edit', [UserManagementController::class, 'edit'])->name('users.edit');
+    Route::put('/users/{id}', [UserManagementController::class, 'update'])->name('users.update');
+    Route::delete('/users/{id}', [UserManagementController::class, 'destroy'])->name('users.destroy');
     Route::post('/users/bulk-action', [UserManagementController::class, 'bulkAction'])->name('users.bulk-action');
+    Route::post('/users/{id}/activate', [UserManagementController::class, 'activate'])->name('users.activate');
     Route::post('/users/{id}/deactivate', [UserManagementController::class, 'deactivate'])->name('users.deactivate');
+    Route::post('/users/{id}/suspend', [UserManagementController::class, 'suspend'])->name('users.suspend');
     Route::post('/users/{id}/ban', [UserManagementController::class, 'ban'])->name('users.ban');
 
     // Ads Management
