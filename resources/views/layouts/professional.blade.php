@@ -104,8 +104,6 @@
         </main>
     </div>
     @stack('scripts')
-    <!-- Chat Bubble Widget -->
-    @include('components.chat-bubble')
 
 </body>
 </html>

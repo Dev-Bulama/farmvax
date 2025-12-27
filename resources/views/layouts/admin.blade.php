@@ -78,8 +78,9 @@
             </div>
 
             <!-- Navigation -->
-            <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+            <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto" x-data="{ openMenu: '{{ request()->routeIs('admin.settings.*') ? 'settings' : (request()->routeIs('admin.users.*') ? 'users' : (request()->routeIs('admin.ads.*') ? 'ads' : (request()->routeIs('admin.outbreak-alerts.*') ? 'alerts' : (request()->routeIs('admin.bulk-messages.*') ? 'messages' : '')))) }}' }">
 
+                <!-- Dashboard -->
                 <a href="{{ route('admin.dashboard') }}" class="flex items-center px-3 py-3 text-sm font-semibold {{ request()->routeIs('admin.dashboard') ? 'text-white bg-secondary/20 rounded-lg border-l-4 border-secondary' : 'text-gray-200 hover:bg-white/10 rounded-lg transition' }}">
                     <svg class="mr-3 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
@@ -87,34 +88,99 @@
                     Dashboard
                 </a>
 
-                <a href="{{ route('admin.users.index') }}" class="flex items-center px-3 py-3 text-sm font-medium {{ request()->routeIs('admin.users.*') ? 'text-white bg-secondary/20 rounded-lg' : 'text-gray-200 hover:bg-white/10 rounded-lg transition' }}">
-                    <svg class="mr-3 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                    </svg>
-                    User Management
-                </a>
+                <!-- User Management (Collapsible) -->
+                <div class="space-y-1">
+                    <button @click="openMenu = openMenu === 'users' ? '' : 'users'" class="flex items-center justify-between w-full px-3 py-3 text-sm font-medium {{ request()->routeIs('admin.users.*') ? 'text-white bg-secondary/20 rounded-lg' : 'text-gray-200 hover:bg-white/10 rounded-lg transition' }}">
+                        <div class="flex items-center">
+                            <svg class="mr-3 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                            </svg>
+                            User Management
+                        </div>
+                        <svg class="h-4 w-4 transform transition-transform" :class="openMenu === 'users' ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+                    <div x-show="openMenu === 'users'" x-collapse class="ml-6 space-y-1">
+                        <a href="{{ route('admin.users.index') }}" class="flex items-center px-3 py-2 text-sm {{ request()->routeIs('admin.users.index') ? 'text-white bg-secondary/10 rounded-lg' : 'text-gray-300 hover:bg-white/5 rounded-lg transition' }}">
+                            All Users
+                        </a>
+                        <a href="{{ route('admin.users.create') }}" class="flex items-center px-3 py-2 text-sm {{ request()->routeIs('admin.users.create') ? 'text-white bg-secondary/10 rounded-lg' : 'text-gray-300 hover:bg-white/5 rounded-lg transition' }}">
+                            Create User
+                        </a>
+                    </div>
+                </div>
 
-                <a href="{{ route('admin.ads.index') }}" class="flex items-center px-3 py-3 text-sm font-medium {{ request()->routeIs('admin.ads.*') ? 'text-white bg-secondary/20 rounded-lg' : 'text-gray-200 hover:bg-white/10 rounded-lg transition' }}">
-                    <svg class="mr-3 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" />
-                    </svg>
-                    Advertisements
-                </a>
+                <!-- Advertisements (Collapsible) -->
+                <div class="space-y-1">
+                    <button @click="openMenu = openMenu === 'ads' ? '' : 'ads'" class="flex items-center justify-between w-full px-3 py-3 text-sm font-medium {{ request()->routeIs('admin.ads.*') ? 'text-white bg-secondary/20 rounded-lg' : 'text-gray-200 hover:bg-white/10 rounded-lg transition' }}">
+                        <div class="flex items-center">
+                            <svg class="mr-3 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" />
+                            </svg>
+                            Advertisements
+                        </div>
+                        <svg class="h-4 w-4 transform transition-transform" :class="openMenu === 'ads' ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+                    <div x-show="openMenu === 'ads'" x-collapse class="ml-6 space-y-1">
+                        <a href="{{ route('admin.ads.index') }}" class="flex items-center px-3 py-2 text-sm {{ request()->routeIs('admin.ads.index') ? 'text-white bg-secondary/10 rounded-lg' : 'text-gray-300 hover:bg-white/5 rounded-lg transition' }}">
+                            All Ads
+                        </a>
+                        <a href="{{ route('admin.ads.create') }}" class="flex items-center px-3 py-2 text-sm {{ request()->routeIs('admin.ads.create') ? 'text-white bg-secondary/10 rounded-lg' : 'text-gray-300 hover:bg-white/5 rounded-lg transition' }}">
+                            Create Ad
+                        </a>
+                    </div>
+                </div>
 
-                <a href="{{ route('admin.outbreak-alerts.index') }}" class="flex items-center px-3 py-3 text-sm font-medium {{ request()->routeIs('admin.outbreak-alerts.*') ? 'text-white bg-secondary/20 rounded-lg' : 'text-gray-200 hover:bg-white/10 rounded-lg transition' }}">
-                    <svg class="mr-3 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                    </svg>
-                    Outbreak Alerts
-                </a>
+                <!-- Outbreak Alerts (Collapsible) -->
+                <div class="space-y-1">
+                    <button @click="openMenu = openMenu === 'alerts' ? '' : 'alerts'" class="flex items-center justify-between w-full px-3 py-3 text-sm font-medium {{ request()->routeIs('admin.outbreak-alerts.*') ? 'text-white bg-secondary/20 rounded-lg' : 'text-gray-200 hover:bg-white/10 rounded-lg transition' }}">
+                        <div class="flex items-center">
+                            <svg class="mr-3 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                            </svg>
+                            Outbreak Alerts
+                        </div>
+                        <svg class="h-4 w-4 transform transition-transform" :class="openMenu === 'alerts' ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+                    <div x-show="openMenu === 'alerts'" x-collapse class="ml-6 space-y-1">
+                        <a href="{{ route('admin.outbreak-alerts.index') }}" class="flex items-center px-3 py-2 text-sm {{ request()->routeIs('admin.outbreak-alerts.index') ? 'text-white bg-secondary/10 rounded-lg' : 'text-gray-300 hover:bg-white/5 rounded-lg transition' }}">
+                            All Alerts
+                        </a>
+                        <a href="{{ route('admin.outbreak-alerts.create') }}" class="flex items-center px-3 py-2 text-sm {{ request()->routeIs('admin.outbreak-alerts.create') ? 'text-white bg-secondary/10 rounded-lg' : 'text-gray-300 hover:bg-white/5 rounded-lg transition' }}">
+                            Create Alert
+                        </a>
+                    </div>
+                </div>
 
-                <a href="{{ route('admin.bulk-messages.index') }}" class="flex items-center px-3 py-3 text-sm font-medium {{ request()->routeIs('admin.bulk-messages.*') ? 'text-white bg-secondary/20 rounded-lg' : 'text-gray-200 hover:bg-white/10 rounded-lg transition' }}">
-                    <svg class="mr-3 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                    </svg>
-                    Bulk Messaging
-                </a>
+                <!-- Bulk Messaging (Collapsible) -->
+                <div class="space-y-1">
+                    <button @click="openMenu = openMenu === 'messages' ? '' : 'messages'" class="flex items-center justify-between w-full px-3 py-3 text-sm font-medium {{ request()->routeIs('admin.bulk-messages.*') ? 'text-white bg-secondary/20 rounded-lg' : 'text-gray-200 hover:bg-white/10 rounded-lg transition' }}">
+                        <div class="flex items-center">
+                            <svg class="mr-3 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                            </svg>
+                            Bulk Messaging
+                        </div>
+                        <svg class="h-4 w-4 transform transition-transform" :class="openMenu === 'messages' ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+                    <div x-show="openMenu === 'messages'" x-collapse class="ml-6 space-y-1">
+                        <a href="{{ route('admin.bulk-messages.index') }}" class="flex items-center px-3 py-2 text-sm {{ request()->routeIs('admin.bulk-messages.index') ? 'text-white bg-secondary/10 rounded-lg' : 'text-gray-300 hover:bg-white/5 rounded-lg transition' }}">
+                            All Messages
+                        </a>
+                        <a href="{{ route('admin.bulk-messages.create') }}" class="flex items-center px-3 py-2 text-sm {{ request()->routeIs('admin.bulk-messages.create') ? 'text-white bg-secondary/10 rounded-lg' : 'text-gray-300 hover:bg-white/5 rounded-lg transition' }}">
+                            Send Message
+                        </a>
+                    </div>
+                </div>
 
+                <!-- Live Chat -->
                 <a href="{{ route('chat.interface') }}" class="flex items-center px-3 py-3 text-sm font-medium {{ request()->is('chat*') ? 'text-white bg-secondary/20 rounded-lg' : 'text-gray-200 hover:bg-white/10 rounded-lg transition' }}">
                     <svg class="mr-3 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
@@ -122,6 +188,7 @@
                     Live Chat
                 </a>
 
+                <!-- Site Builder -->
                 <a href="{{ route('admin.site-builder.index') }}" class="flex items-center px-3 py-3 text-sm font-medium {{ request()->routeIs('admin.site-builder.*') ? 'text-white bg-secondary/20 rounded-lg' : 'text-gray-200 hover:bg-white/10 rounded-lg transition' }}">
                     <svg class="mr-3 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
@@ -129,14 +196,40 @@
                     Site Builder
                 </a>
 
-                <a href="{{ route('admin.settings.index') }}" class="flex items-center px-3 py-3 text-sm font-medium {{ request()->routeIs('admin.settings.*') ? 'text-white bg-secondary/20 rounded-lg' : 'text-gray-200 hover:bg-white/10 rounded-lg transition' }}">
-                    <svg class="mr-3 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
-                    Settings
-                </a>
+                <!-- Settings (Collapsible) -->
+                <div class="space-y-1">
+                    <button @click="openMenu = openMenu === 'settings' ? '' : 'settings'" class="flex items-center justify-between w-full px-3 py-3 text-sm font-medium {{ request()->routeIs('admin.settings.*') ? 'text-white bg-secondary/20 rounded-lg' : 'text-gray-200 hover:bg-white/10 rounded-lg transition' }}">
+                        <div class="flex items-center">
+                            <svg class="mr-3 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                            Settings
+                        </div>
+                        <svg class="h-4 w-4 transform transition-transform" :class="openMenu === 'settings' ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+                    <div x-show="openMenu === 'settings'" x-collapse class="ml-6 space-y-1">
+                        <a href="{{ route('admin.settings.index') }}" class="flex items-center px-3 py-2 text-sm {{ request()->routeIs('admin.settings.index') ? 'text-white bg-secondary/10 rounded-lg' : 'text-gray-300 hover:bg-white/5 rounded-lg transition' }}">
+                            General
+                        </a>
+                        <a href="{{ route('admin.settings.email') }}" class="flex items-center px-3 py-2 text-sm {{ request()->routeIs('admin.settings.email') ? 'text-white bg-secondary/10 rounded-lg' : 'text-gray-300 hover:bg-white/5 rounded-lg transition' }}">
+                            Email
+                        </a>
+                        <a href="{{ route('admin.settings.sms') }}" class="flex items-center px-3 py-2 text-sm {{ request()->routeIs('admin.settings.sms') ? 'text-white bg-secondary/10 rounded-lg' : 'text-gray-300 hover:bg-white/5 rounded-lg transition' }}">
+                            SMS
+                        </a>
+                        <a href="{{ route('admin.settings.ai') }}" class="flex items-center px-3 py-2 text-sm {{ request()->routeIs('admin.settings.ai') ? 'text-white bg-secondary/10 rounded-lg' : 'text-gray-300 hover:bg-white/5 rounded-lg transition' }}">
+                            AI Chatbot
+                        </a>
+                        <a href="{{ route('admin.settings.professional-types') }}" class="flex items-center px-3 py-2 text-sm {{ request()->routeIs('admin.settings.professional-types') ? 'text-white bg-secondary/10 rounded-lg' : 'text-gray-300 hover:bg-white/5 rounded-lg transition' }}">
+                            Professional Types
+                        </a>
+                    </div>
+                </div>
 
+                <!-- Statistics -->
                 <a href="{{ route('admin.statistics') }}" class="flex items-center px-3 py-3 text-sm font-medium {{ request()->routeIs('admin.statistics') ? 'text-white bg-secondary/20 rounded-lg' : 'text-gray-200 hover:bg-white/10 rounded-lg transition' }}">
                     <svg class="mr-3 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
@@ -232,9 +325,6 @@
         </div>
 
     </div>
-
-    <!-- Chat Bubble Widget -->
-    @include('components.chat-bubble')
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
