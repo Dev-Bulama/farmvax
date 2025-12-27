@@ -1,3 +1,4 @@
+use App\Http\Controllers\Api\AiChatController;
 <?php
 
 use Illuminate\Support\Facades\Route;
@@ -54,6 +55,9 @@ Route::get('/register', function () {
 |--------------------------------------------------------------------------
 */
 Route::prefix('api')->name('api.')->group(function () {
+    // AI Chat API
+    Route::post('/ai/chat', [AiChatController::class, 'chat'])->name('ai.chat');
+
     // Location APIs
     Route::get('/countries', [LocationController::class, 'countries'])->name('countries');
     Route::get('/states/{countryId?}', [LocationController::class, 'states'])->name('states');
