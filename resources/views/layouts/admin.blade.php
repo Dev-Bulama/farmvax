@@ -5,225 +5,268 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Admin Dashboard') - {{ config('app.name', 'FarmVax') }}</title>
-
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#11455B',
+                        secondary: '#2FCB6E',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
-    <!-- Alpine.js -->
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+        * {
+            font-family: 'Inter', sans-serif;
+        }
 
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        .card-hover {
+            transition: all 0.3s ease;
+        }
 
+        .card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(17, 69, 91, 0.15);
+        }
+    </style>
     @stack('styles')
 </head>
-<body class="bg-gray-100" x-data="{ sidebarOpen: true }">
+<body class="bg-gray-100">
 
-    <!-- Sidebar -->
-    <aside :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
-           class="fixed inset-y-0 left-0 z-50 w-64 bg-gray-900 text-white transition-transform duration-300 ease-in-out lg:translate-x-0">
+    <div class="flex h-screen overflow-hidden">
 
-        <!-- Logo -->
-        <div class="flex items-center justify-between h-16 px-6 bg-gray-800">
-            <div class="flex items-center">
-                <i class="fas fa-heartbeat text-green-500 text-2xl mr-2"></i>
-                <span class="text-xl font-bold">FarmVax</span>
-            </div>
-            <button @click="sidebarOpen = false" class="lg:hidden">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
+        <!-- Mobile Overlay -->
+        <div id="mobile-overlay" class="hidden fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"></div>
 
-        <!-- Navigation -->
-        <nav class="mt-6 px-4">
-            <a href="{{ route('admin.dashboard') }}"
-               class="flex items-center px-4 py-3 mb-2 rounded-lg {{ request()->routeIs('admin.dashboard') ? 'bg-green-600' : 'hover:bg-gray-800' }}">
-                <i class="fas fa-dashboard mr-3"></i>
-                <span>Dashboard</span>
-            </a>
+        <!-- Sidebar -->
+        <aside id="sidebar" class="fixed md:static inset-y-0 left-0 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out z-50 md:z-auto w-64 bg-primary flex flex-col">
 
-            <!-- User Management -->
-            <div x-data="{ open: {{ request()->routeIs('admin.users.*') ? 'true' : 'false' }} }">
-                <button @click="open = !open" class="flex items-center justify-between w-full px-4 py-3 mb-2 rounded-lg hover:bg-gray-800">
-                    <div class="flex items-center">
-                        <i class="fas fa-users mr-3"></i>
-                        <span>Users</span>
+            <!-- Logo -->
+            <div class="flex items-center justify-between h-16 px-4 bg-primary/90">
+                <div class="flex items-center space-x-2">
+                    <div class="w-10 h-10 bg-gradient-to-br from-secondary to-primary rounded-lg flex items-center justify-center">
+                        <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                        </svg>
                     </div>
-                    <i class="fas fa-chevron-down transition-transform" :class="{ 'rotate-180': open }"></i>
+                    <span class="text-white text-lg font-bold">FarmVax</span>
+                </div>
+                <!-- Close button for mobile -->
+                <button id="close-sidebar" class="md:hidden text-white">
+                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
                 </button>
-                <div x-show="open" x-collapse class="ml-4 space-y-1">
-                    <a href="{{ route('admin.users.index', ['role' => 'farmer']) }}"
-                       class="block px-4 py-2 rounded hover:bg-gray-800 {{ request()->is('admin/users*') && request('role') == 'farmer' ? 'bg-gray-800' : '' }}">
-                        <i class="fas fa-tractor mr-2 text-sm"></i> Farmers
-                    </a>
-                    <a href="{{ route('admin.users.index', ['role' => 'animal_health_professional']) }}"
-                       class="block px-4 py-2 rounded hover:bg-gray-800 {{ request()->is('admin/users*') && request('role') == 'animal_health_professional' ? 'bg-gray-800' : '' }}">
-                        <i class="fas fa-user-md mr-2 text-sm"></i> Professionals
-                    </a>
-                    <a href="{{ route('admin.users.index', ['role' => 'volunteer']) }}"
-                       class="block px-4 py-2 rounded hover:bg-gray-800 {{ request()->is('admin/users*') && request('role') == 'volunteer' ? 'bg-gray-800' : '' }}">
-                        <i class="fas fa-hands-helping mr-2 text-sm"></i> Volunteers
-                    </a>
-                    <a href="{{ route('admin.users.index', ['role' => 'admin']) }}"
-                       class="block px-4 py-2 rounded hover:bg-gray-800 {{ request()->is('admin/users*') && request('role') == 'admin' ? 'bg-gray-800' : '' }}">
-                        <i class="fas fa-user-shield mr-2 text-sm"></i> Admins
-                    </a>
+            </div>
+
+            <!-- Admin Badge -->
+            <div class="px-4 py-3 bg-primary/80">
+                <div class="flex items-center space-x-2">
+                    <div class="w-8 h-8 bg-secondary rounded-full flex items-center justify-center">
+                        <span class="text-white text-xs font-bold">{{ substr(auth()->user()->name, 0, 1) }}</span>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm font-semibold text-white truncate">{{ auth()->user()->name }}</p>
+                        <p class="text-xs text-gray-300">Administrator</p>
+                    </div>
                 </div>
             </div>
 
-            <a href="{{ route('admin.ads.index') }}"
-               class="flex items-center px-4 py-3 mb-2 rounded-lg {{ request()->routeIs('admin.ads.*') ? 'bg-green-600' : 'hover:bg-gray-800' }}">
-                <i class="fas fa-bullhorn mr-3"></i>
-                <span>Advertisements</span>
-            </a>
+            <!-- Navigation -->
+            <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
 
-            <a href="{{ route('admin.outbreak-alerts.index') }}"
-               class="flex items-center px-4 py-3 mb-2 rounded-lg {{ request()->routeIs('admin.outbreak-alerts.*') ? 'bg-green-600' : 'hover:bg-gray-800' }}">
-                <i class="fas fa-exclamation-triangle mr-3"></i>
-                <span>Outbreak Alerts</span>
-            </a>
+                <a href="{{ route('admin.dashboard') }}" class="flex items-center px-3 py-3 text-sm font-semibold {{ request()->routeIs('admin.dashboard') ? 'text-white bg-secondary/20 rounded-lg border-l-4 border-secondary' : 'text-gray-200 hover:bg-white/10 rounded-lg transition' }}">
+                    <svg class="mr-3 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                    </svg>
+                    Dashboard
+                </a>
 
-            <a href="{{ route('admin.bulk-messages.index') }}"
-               class="flex items-center px-4 py-3 mb-2 rounded-lg {{ request()->routeIs('admin.bulk-messages.*') ? 'bg-green-600' : 'hover:bg-gray-800' }}">
-                <i class="fas fa-envelope-open-text mr-3"></i>
-                <span>Bulk Messaging</span>
-            </a>
+                <a href="{{ route('admin.users.index') }}" class="flex items-center px-3 py-3 text-sm font-medium {{ request()->routeIs('admin.users.*') ? 'text-white bg-secondary/20 rounded-lg' : 'text-gray-200 hover:bg-white/10 rounded-lg transition' }}">
+                    <svg class="mr-3 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                    </svg>
+                    User Management
+                </a>
 
-            <a href="{{ url('/chat/conversations') }}"
-               class="flex items-center px-4 py-3 mb-2 rounded-lg {{ request()->is('chat*') ? 'bg-green-600' : 'hover:bg-gray-800' }}">
-                <i class="fas fa-comments mr-3"></i>
-                <span>Live Chat</span>
-            </a>
+                <a href="{{ route('admin.ads.index') }}" class="flex items-center px-3 py-3 text-sm font-medium {{ request()->routeIs('admin.ads.*') ? 'text-white bg-secondary/20 rounded-lg' : 'text-gray-200 hover:bg-white/10 rounded-lg transition' }}">
+                    <svg class="mr-3 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" />
+                    </svg>
+                    Advertisements
+                </a>
 
-            <!-- Settings -->
-            <div x-data="{ open: {{ request()->routeIs('admin.settings.*') ? 'true' : 'false' }} }">
-                <button @click="open = !open" class="flex items-center justify-between w-full px-4 py-3 mb-2 rounded-lg hover:bg-gray-800">
-                    <div class="flex items-center">
-                        <i class="fas fa-cog mr-3"></i>
-                        <span>Settings</span>
-                    </div>
-                    <i class="fas fa-chevron-down transition-transform" :class="{ 'rotate-180': open }"></i>
-                </button>
-                <div x-show="open" x-collapse class="ml-4 space-y-1">
-                    <a href="{{ route('admin.settings.index') }}"
-                       class="block px-4 py-2 rounded hover:bg-gray-800 {{ request()->is('admin/settings') ? 'bg-gray-800' : '' }}">
-                        <i class="fas fa-sliders-h mr-2 text-sm"></i> General
-                    </a>
-                    <a href="{{ route('admin.settings.email') }}"
-                       class="block px-4 py-2 rounded hover:bg-gray-800 {{ request()->is('admin/settings/email') ? 'bg-gray-800' : '' }}">
-                        <i class="fas fa-envelope mr-2 text-sm"></i> Email
-                    </a>
-                    <a href="{{ route('admin.settings.sms') }}"
-                       class="block px-4 py-2 rounded hover:bg-gray-800 {{ request()->is('admin/settings/sms') ? 'bg-gray-800' : '' }}">
-                        <i class="fas fa-sms mr-2 text-sm"></i> SMS
-                    </a>
-                    <a href="{{ route('admin.settings.ai') }}"
-                       class="block px-4 py-2 rounded hover:bg-gray-800 {{ request()->is('admin/settings/ai') ? 'bg-gray-800' : '' }}">
-                        <i class="fas fa-robot mr-2 text-sm"></i> AI Chatbot
-                    </a>
-                    <a href="{{ route('admin.settings.professional-types') }}"
-                       class="block px-4 py-2 rounded hover:bg-gray-800 {{ request()->is('admin/settings/professional-types') ? 'bg-gray-800' : '' }}">
-                        <i class="fas fa-briefcase mr-2 text-sm"></i> Professional Types
-                    </a>
-                </div>
-            </div>
-        </nav>
+                <a href="{{ route('admin.outbreak-alerts.index') }}" class="flex items-center px-3 py-3 text-sm font-medium {{ request()->routeIs('admin.outbreak-alerts.*') ? 'text-white bg-secondary/20 rounded-lg' : 'text-gray-200 hover:bg-white/10 rounded-lg transition' }}">
+                    <svg class="mr-3 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                    Outbreak Alerts
+                </a>
 
-        <!-- User Menu -->
-        <div class="absolute bottom-0 w-64 p-4 bg-gray-800">
-            <div x-data="{ open: false }" class="relative">
-                <button @click="open = !open" class="flex items-center w-full text-left">
-                    <div class="w-10 h-10 rounded-full bg-green-600 flex items-center justify-center mr-3">
-                        <i class="fas fa-user"></i>
-                    </div>
-                    <div class="flex-1">
-                        <div class="font-semibold">{{ auth()->user()->name }}</div>
-                        <div class="text-xs text-gray-400">{{ ucfirst(auth()->user()->role) }}</div>
-                    </div>
-                    <i class="fas fa-chevron-up"></i>
-                </button>
-                <div x-show="open" @click.away="open = false"
-                     class="absolute bottom-full left-0 w-full mb-2 bg-gray-700 rounded-lg shadow-lg">
-                    <a href="{{ route('profile.edit') }}" class="block px-4 py-2 hover:bg-gray-600 rounded-t-lg">
-                        <i class="fas fa-user-edit mr-2"></i> Profile
-                    </a>
-                    <form method="POST" action="{{ route('logout') }}">
-                        @csrf
-                        <button type="submit" class="w-full text-left px-4 py-2 hover:bg-gray-600 rounded-b-lg">
-                            <i class="fas fa-sign-out-alt mr-2"></i> Logout
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </aside>
+                <a href="{{ route('admin.bulk-messages.index') }}" class="flex items-center px-3 py-3 text-sm font-medium {{ request()->routeIs('admin.bulk-messages.*') ? 'text-white bg-secondary/20 rounded-lg' : 'text-gray-200 hover:bg-white/10 rounded-lg transition' }}">
+                    <svg class="mr-3 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                    Bulk Messaging
+                </a>
 
-    <!-- Main Content -->
-    <div class="lg:pl-64">
-        <!-- Top Bar -->
-        <header class="bg-white shadow-sm h-16 flex items-center justify-between px-6">
-            <button @click="sidebarOpen = true" class="lg:hidden">
-                <i class="fas fa-bars text-xl"></i>
-            </button>
+                <a href="{{ route('chat.interface') }}" class="flex items-center px-3 py-3 text-sm font-medium {{ request()->is('chat*') ? 'text-white bg-secondary/20 rounded-lg' : 'text-gray-200 hover:bg-white/10 rounded-lg transition' }}">
+                    <svg class="mr-3 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                    </svg>
+                    Live Chat
+                </a>
 
-            <h1 class="text-xl font-semibold text-gray-800">@yield('page-title', 'Dashboard')</h1>
+                <a href="{{ route('admin.site-builder.index') }}" class="flex items-center px-3 py-3 text-sm font-medium {{ request()->routeIs('admin.site-builder.*') ? 'text-white bg-secondary/20 rounded-lg' : 'text-gray-200 hover:bg-white/10 rounded-lg transition' }}">
+                    <svg class="mr-3 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+                    </svg>
+                    Site Builder
+                </a>
 
-            <div class="flex items-center space-x-4">
-                <!-- Notifications -->
-                <div x-data="{ open: false }" class="relative">
-                    <button @click="open = !open" class="relative p-2 text-gray-600 hover:text-gray-800">
-                        <i class="fas fa-bell text-xl"></i>
-                        <span class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
+                <a href="{{ route('admin.settings.index') }}" class="flex items-center px-3 py-3 text-sm font-medium {{ request()->routeIs('admin.settings.*') ? 'text-white bg-secondary/20 rounded-lg' : 'text-gray-200 hover:bg-white/10 rounded-lg transition' }}">
+                    <svg class="mr-3 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    Settings
+                </a>
+
+                <a href="{{ route('admin.statistics') }}" class="flex items-center px-3 py-3 text-sm font-medium {{ request()->routeIs('admin.statistics') ? 'text-white bg-secondary/20 rounded-lg' : 'text-gray-200 hover:bg-white/10 rounded-lg transition' }}">
+                    <svg class="mr-3 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                    </svg>
+                    Statistics
+                </a>
+            </nav>
+
+            <!-- Logout -->
+            <div class="px-3 py-4 border-t border-white/10">
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+                    <button type="submit" class="flex items-center w-full px-3 py-3 text-sm font-medium text-gray-200 hover:bg-white/10 rounded-lg transition">
+                        <svg class="mr-3 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                        </svg>
+                        Logout
                     </button>
-                    <div x-show="open" @click.away="open = false"
-                         class="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-xl z-50">
-                        <div class="p-4 border-b">
-                            <h3 class="font-semibold">Notifications</h3>
+                </form>
+            </div>
+
+        </aside>
+
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+
+            <!-- Header -->
+            <header class="bg-white shadow-sm z-10">
+                <div class="px-4 sm:px-6 lg:px-8 py-4">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-3">
+                            <!-- Mobile Menu Button -->
+                            <button id="mobile-menu-button" class="md:hidden p-2 rounded-lg text-primary hover:bg-gray-100">
+                                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                                </svg>
+                            </button>
+                            <div>
+                                <h1 class="text-2xl font-black text-primary">@yield('page-title', 'Dashboard')</h1>
+                                <p class="text-sm text-gray-600 hidden sm:block">@yield('page-subtitle', 'Manage your platform')</p>
+                            </div>
                         </div>
-                        <div class="max-h-96 overflow-y-auto">
-                            <div class="p-4 text-center text-gray-500">
-                                No new notifications
+                        <div class="flex items-center space-x-4">
+                            <div class="text-right hidden sm:block">
+                                <p class="text-xs text-gray-500">{{ now()->format('l, F j, Y') }}</p>
+                                <p class="text-xs text-gray-400">{{ now()->format('g:i A') }}</p>
                             </div>
                         </div>
                     </div>
                 </div>
+            </header>
 
-                <!-- Messages -->
-                <a href="{{ url('/chat/conversations') }}" class="p-2 text-gray-600 hover:text-gray-800">
-                    <i class="fas fa-envelope text-xl"></i>
-                </a>
-            </div>
-        </header>
-
-        <!-- Page Content -->
-        <main class="p-6">
+            <!-- Success Message -->
             @if(session('success'))
-                <div class="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded-lg">
-                    <i class="fas fa-check-circle mr-2"></i>
-                    {{ session('success') }}
+            <div class="mx-4 sm:mx-6 lg:mx-8 mt-4">
+                <div class="bg-green-50 border border-green-200 text-green-800 rounded-xl p-4 flex items-center">
+                    <svg class="h-5 w-5 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                    </svg>
+                    <p class="font-medium">{{ session('success') }}</p>
                 </div>
+            </div>
             @endif
 
             @if(session('error'))
-                <div class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
-                    <i class="fas fa-exclamation-circle mr-2"></i>
-                    {{ session('error') }}
+            <div class="mx-4 sm:mx-6 lg:mx-8 mt-4">
+                <div class="bg-red-50 border border-red-200 text-red-800 rounded-xl p-4 flex items-center">
+                    <svg class="h-5 w-5 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                    </svg>
+                    <p class="font-medium">{{ session('error') }}</p>
                 </div>
+            </div>
             @endif
 
             @if($errors->any())
-                <div class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+            <div class="mx-4 sm:mx-6 lg:mx-8 mt-4">
+                <div class="bg-red-50 border border-red-200 text-red-800 rounded-xl p-4">
                     <ul class="list-disc list-inside">
                         @foreach($errors->all() as $error)
                             <li>{{ $error }}</li>
                         @endforeach
                     </ul>
                 </div>
+            </div>
             @endif
 
-            @yield('content')
-        </main>
+            <!-- Main Content Area -->
+            <main class="flex-1 overflow-y-auto px-4 sm:px-6 lg:px-8 py-8 bg-gray-50">
+                @yield('content')
+            </main>
+
+        </div>
+
     </div>
+
+    <!-- Chat Bubble Widget -->
+    @include('components.chat-bubble')
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('mobile-overlay');
+            const menuButton = document.getElementById('mobile-menu-button');
+            const closeButton = document.getElementById('close-sidebar');
+
+            // Open sidebar
+            menuButton.addEventListener('click', function() {
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden');
+            });
+
+            // Close sidebar
+            function closeSidebar() {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+            }
+
+            closeButton.addEventListener('click', closeSidebar);
+            overlay.addEventListener('click', closeSidebar);
+
+            // Close on nav link click (mobile)
+            if (window.innerWidth < 768) {
+                const navLinks = sidebar.querySelectorAll('a');
+                navLinks.forEach(link => {
+                    link.addEventListener('click', closeSidebar);
+                });
+            }
+        });
+    </script>
 
     @stack('scripts')
 </body>

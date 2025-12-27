@@ -1,213 +1,160 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Volunteer Dashboard - FarmVax</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-100">
+@extends('layouts.volunteer')
 
-<div class="flex h-screen overflow-hidden">
-    @include('volunteer.partials.sidebar')
+@section('title', 'Volunteer Dashboard')
+@section('page-title', 'Volunteer Dashboard')
 
-    <div class="flex-1 overflow-auto">
-        <header class="bg-white shadow">
-            <div class="px-4 sm:px-6 lg:px-8 py-4">
-                <div class="flex justify-between items-center">
-                    <div>
-                        <h1 class="text-2xl font-bold text-indigo-600">Volunteer Dashboard</h1>
-                        <p class="text-sm text-gray-600">Welcome back, {{ auth()->user()->name }}!</p>
-                    </div>
-                    <div class="text-right">
-                        <p class="text-xs text-gray-500">{{ now()->format('l, F j, Y') }}</p>
-                        <p class="text-xs text-gray-400">{{ now()->format('g:i A') }}</p>
-                    </div>
-                </div>
+@section('content')
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+    <div class="bg-white rounded-lg shadow p-6">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-gray-600 text-sm">Farmers Enrolled</p>
+                <h3 class="text-2xl font-bold text-gray-800">{{ $stats['farmers_enrolled'] ?? 0 }}</h3>
             </div>
-            
-            <button id="mobile-menu-button" class="md:hidden fixed top-4 left-4 z-50 p-2 rounded-md bg-indigo-600 text-white hover:bg-indigo-700">
-                <svg id="menu-open-icon" class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
-                </svg>
-                <svg id="menu-close-icon" class="h-6 w-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                </svg>
-            </button>
-        </header>
-
-        @if(session('success'))
-        <div class="mx-4 sm:mx-6 lg:mx-8 mt-4">
-            <div class="bg-indigo-50 border border-indigo-200 text-indigo-800 rounded-md p-4">
-                {{ session('success') }}
+            <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
+                <i class="fas fa-users text-purple-600 text-xl"></i>
             </div>
         </div>
-        @endif
+    </div>
 
-        <main class="px-4 sm:px-6 lg:px-8 py-8">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                <div class="bg-white rounded-lg shadow p-6">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0 rounded-md bg-indigo-600 p-3">
-                            <svg class="h-8 w-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
-                            </svg>
-                        </div>
-                        <div class="ml-4">
-                            <p class="text-sm font-medium text-gray-600">Farmers Enrolled</p>
-                            <p class="text-2xl font-bold text-indigo-600">{{ $stats['farmers_enrolled'] ?? 0 }}</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-white rounded-lg shadow p-6">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0 rounded-md bg-green-600 p-3">
-                            <svg class="h-8 w-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                            </svg>
-                        </div>
-                        <div class="ml-4">
-                            <p class="text-sm font-medium text-gray-600">This Month</p>
-                            <p class="text-2xl font-bold text-green-600">{{ $stats['this_month'] ?? 0 }}</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-white rounded-lg shadow p-6">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0 rounded-md bg-blue-600 p-3">
-                            <svg class="h-8 w-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                            </svg>
-                        </div>
-                        <div class="ml-4">
-                            <p class="text-sm font-medium text-gray-600">This Week</p>
-                            <p class="text-2xl font-bold text-blue-600">{{ $stats['this_week'] ?? 0 }}</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-white rounded-lg shadow p-6">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0 rounded-md bg-purple-600 p-3">
-                            <svg class="h-8 w-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
-                            </svg>
-                        </div>
-                        <div class="ml-4">
-                            <p class="text-sm font-medium text-gray-600">Active Status</p>
-                            <p class="text-2xl font-bold text-purple-600">Active</p>
-                        </div>
-                    </div>
-                </div>
+    <div class="bg-white rounded-lg shadow p-6">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-gray-600 text-sm">Total Points</p>
+                <h3 class="text-2xl font-bold text-gray-800">{{ $stats['total_points'] ?? 0 }}</h3>
             </div>
-
-            <div class="mb-8">
-                <h2 class="text-lg font-bold text-gray-900 mb-4">Quick Actions</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <a href="{{ route('volunteer.enroll.farmer') }}" class="bg-white rounded-lg shadow p-6 hover:shadow-lg transition">
-                        <div class="flex items-center">
-                            <div class="flex-shrink-0 rounded-md bg-indigo-100 p-3">
-                                <svg class="h-6 w-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
-                                </svg>
-                            </div>
-                            <div class="ml-4">
-                                <h3 class="text-sm font-medium text-gray-900">Enroll New Farmer</h3>
-                                <p class="text-xs text-gray-500">Register farmer to FarmVax</p>
-                            </div>
-                        </div>
-                    </a>
-
-                    <a href="{{ route('volunteer.my-farmers') }}" class="bg-white rounded-lg shadow p-6 hover:shadow-lg transition">
-                        <div class="flex items-center">
-                            <div class="flex-shrink-0 rounded-md bg-green-100 p-3">
-                                <svg class="h-6 w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
-                                </svg>
-                            </div>
-                            <div class="ml-4">
-                                <h3 class="text-sm font-medium text-gray-900">View My Farmers</h3>
-                                <p class="text-xs text-gray-500">Manage enrolled farmers</p>
-                            </div>
-                        </div>
-                    </a>
-                </div>
+            <div class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center">
+                <i class="fas fa-star text-yellow-600 text-xl"></i>
             </div>
+        </div>
+    </div>
 
-            <div class="bg-white rounded-lg shadow">
-                <div class="px-6 py-4 border-b border-gray-200">
-                    <h2 class="text-lg font-bold text-indigo-600">Recently Enrolled Farmers</h2>
-                </div>
-                <div class="p-6">
-                    @if(isset($recentFarmers) && $recentFarmers->count() > 0)
-                    <div class="space-y-4">
-                        @foreach($recentFarmers as $farmer)
-                        <div class="flex items-center p-3 bg-gray-50 rounded-lg">
-                            <div class="flex-shrink-0 h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center font-bold text-indigo-600">
-                                {{ substr($farmer->name, 0, 1) }}
-                            </div>
-                            <div class="ml-3 flex-1">
-                                <p class="text-sm font-medium text-gray-900">{{ $farmer->name }}</p>
-                                <p class="text-xs text-gray-600">{{ $farmer->email }} - {{ $farmer->phone }}</p>
-                            </div>
-                            <div class="text-right">
-                                <p class="text-xs text-gray-500">{{ $farmer->created_at->diffForHumans() }}</p>
-                            </div>
-                        </div>
-                        @endforeach
-                    </div>
-                    @else
-                    <div class="text-center py-8">
-                        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
-                        </svg>
-                        <p class="mt-2 text-sm text-gray-500">No farmers enrolled yet</p>
-                        <a href="{{ route('volunteer.enroll.farmer') }}" class="mt-2 inline-block text-sm text-indigo-600 hover:underline">Enroll your first farmer</a>
-                    </div>
-                    @endif
-                </div>
+    <div class="bg-white rounded-lg shadow p-6">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-gray-600 text-sm">Badges Earned</p>
+                <h3 class="text-2xl font-bold text-gray-800">{{ $stats['badges'] ?? 0 }}</h3>
             </div>
-        </main>
+            <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                <i class="fas fa-award text-blue-600 text-xl"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-lg shadow p-6">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-gray-600 text-sm">Leaderboard Rank</p>
+                <h3 class="text-2xl font-bold text-purple-600">#{{ $stats['rank'] ?? 'N/A' }}</h3>
+            </div>
+            <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                <i class="fas fa-trophy text-green-600 text-xl"></i>
+            </div>
+        </div>
     </div>
 </div>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const sidebar = document.getElementById('sidebar');
-    const overlay = document.getElementById('mobile-overlay');
-    const menuButton = document.getElementById('mobile-menu-button');
-    const menuOpenIcon = document.getElementById('menu-open-icon');
-    const menuCloseIcon = document.getElementById('menu-close-icon');
+<div class="mb-6 bg-gradient-to-r from-purple-500 to-purple-700 text-white rounded-lg shadow p-6">
+    <div class="flex items-center justify-between">
+        <div>
+            <h3 class="text-xl font-bold mb-2">Next Badge: Silver Contributor</h3>
+            <p class="text-purple-100 text-sm">Enroll 5 more farmers to unlock</p>
+        </div>
+        <div class="text-6xl opacity-50">
+            <i class="fas fa-medal"></i>
+        </div>
+    </div>
+    <div class="mt-4">
+        <div class="w-full bg-purple-900 rounded-full h-2">
+            <div class="bg-yellow-400 h-2 rounded-full" style="width: 60%"></div>
+        </div>
+        <p class="text-xs text-purple-100 mt-1">60% Complete</p>
+    </div>
+</div>
 
-    menuButton.addEventListener('click', function() {
-        sidebar.classList.toggle('-translate-x-full');
-        overlay.classList.toggle('hidden');
-        menuOpenIcon.classList.toggle('hidden');
-        menuCloseIcon.classList.toggle('hidden');
-    });
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+    <div class="bg-white rounded-lg shadow">
+        <div class="p-6 border-b flex items-center justify-between">
+            <h3 class="text-lg font-semibold">Recently Enrolled Farmers</h3>
+            <a href="{{ route('volunteer.my-farmers') }}" class="text-purple-600 hover:text-purple-800 text-sm">View All →</a>
+        </div>
+        <div class="p-6">
+            @if(isset($recentEnrollments) && count($recentEnrollments) > 0)
+                <div class="space-y-4">
+                    @foreach($recentEnrollments as $enrollment)
+                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded">
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center mr-3">
+                                    <i class="fas fa-user text-purple-600"></i>
+                                </div>
+                                <div>
+                                    <p class="font-semibold">{{ $enrollment->farmer->name ?? 'N/A' }}</p>
+                                    <p class="text-xs text-gray-500">{{ $enrollment->created_at->diffForHumans() }}</p>
+                                </div>
+                            </div>
+                            <span class="text-green-600 font-semibold">+10 pts</span>
+                        </div>
+                    @endforeach
+                </div>
+            @else
+                <p class="text-gray-500 text-center py-8">No enrollments yet</p>
+            @endif
+        </div>
+    </div>
 
-    overlay.addEventListener('click', function() {
-        sidebar.classList.add('-translate-x-full');
-        overlay.classList.add('hidden');
-        menuOpenIcon.classList.remove('hidden');
-        menuCloseIcon.classList.add('hidden');
-    });
+    <div class="bg-white rounded-lg shadow">
+        <div class="p-6 border-b">
+            <h3 class="text-lg font-semibold">Leaderboard - Top Volunteers</h3>
+        </div>
+        <div class="p-6">
+            @if(isset($leaderboard) && count($leaderboard) > 0)
+                <div class="space-y-3">
+                    @foreach($leaderboard as $index => $volunteer)
+                        <div class="flex items-center justify-between p-3 {{ $volunteer->id == auth()->id() ? 'bg-purple-50 border border-purple-200' : 'bg-gray-50' }} rounded">
+                            <div class="flex items-center">
+                                <span class="w-8 h-8 flex items-center justify-center font-bold {{ $index < 3 ? 'text-yellow-600' : 'text-gray-600' }}">
+                                    #{{ $index + 1 }}
+                                </span>
+                                <p class="ml-3 font-semibold">{{ $volunteer->name }}</p>
+                            </div>
+                            <span class="text-purple-600 font-semibold">{{ $volunteer->total_points ?? 0 }} pts</span>
+                        </div>
+                    @endforeach
+                </div>
+            @else
+                <p class="text-gray-500 text-center py-8">No data available</p>
+            @endif
+        </div>
+    </div>
+</div>
 
-    if (window.innerWidth < 768) {
-        const navLinks = sidebar.querySelectorAll('a');
-        navLinks.forEach(link => {
-            link.addEventListener('click', function() {
-                sidebar.classList.add('-translate-x-full');
-                overlay.classList.add('hidden');
-                menuOpenIcon.classList.remove('hidden');
-                menuCloseIcon.classList.add('hidden');
-            });
-        });
-    }
-});
-</script>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+    <a href="{{ route('volunteer.enroll.farmer') }}" class="flex flex-col items-center p-6 bg-white rounded-lg shadow hover:shadow-lg transition">
+        <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mb-3">
+            <i class="fas fa-user-plus text-purple-600 text-xl"></i>
+        </div>
+        <span class="font-semibold text-gray-700">Enroll Farmer</span>
+    </a>
 
-</body>
-</html>
+    <a href="{{ route('volunteer.my-farmers') }}" class="flex flex-col items-center p-6 bg-white rounded-lg shadow hover:shadow-lg transition">
+        <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mb-3">
+            <i class="fas fa-users text-blue-600 text-xl"></i>
+        </div>
+        <span class="font-semibold text-gray-700">My Farmers</span>
+    </a>
+
+    <a href="{{ route('volunteer.activity') }}" class="flex flex-col items-center p-6 bg-white rounded-lg shadow hover:shadow-lg transition">
+        <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mb-3">
+            <i class="fas fa-chart-line text-green-600 text-xl"></i>
+        </div>
+        <span class="font-semibold text-gray-700">My Activity</span>
+    </a>
+
+    <a href="{{ url('/chat') }}" class="flex flex-col items-center p-6 bg-white rounded-lg shadow hover:shadow-lg transition">
+        <div class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center mb-3">
+            <i class="fas fa-comments text-yellow-600 text-xl"></i>
+        </div>
+        <span class="font-semibold text-gray-700">Messages</span>
+    </a>
+</div>
+@endsection

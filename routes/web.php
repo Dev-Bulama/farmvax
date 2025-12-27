@@ -1,3 +1,4 @@
+use App\Http\Controllers\Api\AiChatController;
 <?php
 
 use Illuminate\Support\Facades\Route;
@@ -54,6 +55,9 @@ Route::get('/register', function () {
 |--------------------------------------------------------------------------
 */
 Route::prefix('api')->name('api.')->group(function () {
+    // AI Chat API
+    Route::post('/ai/chat', [AiChatController::class, 'chat'])->name('ai.chat');
+
     // Location APIs
     Route::get('/countries', [LocationController::class, 'countries'])->name('countries');
     Route::get('/states/{countryId?}', [LocationController::class, 'states'])->name('states');
@@ -172,6 +176,11 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     // Analytics & Statistics
     Route::get('/analytics', [AdminDashboardController::class, 'analytics'])->name('analytics');
     Route::get('/statistics', [AdminDashboardController::class, 'statistics'])->name('statistics');
+
+    // Site Builder
+    Route::get('/site-builder', function() {
+        return view('admin.site-builder.index');
+    })->name('site-builder.index');
 });
 
 /*
