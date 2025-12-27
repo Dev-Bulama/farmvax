@@ -172,6 +172,11 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     // Analytics & Statistics
     Route::get('/analytics', [AdminDashboardController::class, 'analytics'])->name('analytics');
     Route::get('/statistics', [AdminDashboardController::class, 'statistics'])->name('statistics');
+
+    // Site Builder
+    Route::get('/site-builder', function() {
+        return view('admin.site-builder.index');
+    })->name('site-builder.index');
 });
 
 /*

@@ -95,6 +95,12 @@
                 <span>Live Chat</span>
             </a>
 
+            <a href="{{ route('admin.site-builder.index') }}"
+               class="flex items-center px-4 py-3 mb-2 rounded-lg {{ request()->routeIs('admin.site-builder.*') ? 'bg-green-600' : 'hover:bg-gray-800' }}">
+                <i class="fas fa-paint-brush mr-3"></i>
+                <span>Site Builder</span>
+            </a>
+
             <!-- Settings -->
             <div x-data="{ open: {{ request()->routeIs('admin.settings.*') ? 'true' : 'false' }} }">
                 <button @click="open = !open" class="flex items-center justify-between w-full px-4 py-3 mb-2 rounded-lg hover:bg-gray-800">
