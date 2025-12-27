@@ -13,6 +13,7 @@ use App\Http\Controllers\Professional\DashboardController as ProfessionalDashboa
 use App\Http\Controllers\Volunteer\DashboardController as VolunteerDashboardController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Api\LocationController;
+use App\Http\Controllers\ChatController;
 
 /*
 |--------------------------------------------------------------------------
@@ -53,11 +54,27 @@ Route::get('/register', function () {
 |--------------------------------------------------------------------------
 */
 Route::prefix('api')->name('api.')->group(function () {
+    // Location APIs
     Route::get('/countries', [LocationController::class, 'countries'])->name('countries');
     Route::get('/states/{countryId?}', [LocationController::class, 'states'])->name('states');
     Route::get('/lgas/{stateId?}', [LocationController::class, 'lgas'])->name('lgas');
     Route::post('/detect-location', [LocationController::class, 'detectLocation'])->name('detect-location');
     Route::get('/locations/search', [LocationController::class, 'search'])->name('locations.search');
+
+    // Chat APIs (Authenticated)
+    Route::middleware('auth')->group(function () {
+        Route::get('/chat/conversations', [ChatController::class, 'index'])->name('chat.index');
+        Route::post('/chat/conversations', [ChatController::class, 'store'])->name('chat.store');
+        Route::get('/chat/conversations/{id}', [ChatController::class, 'show'])->name('chat.show');
+        Route::post('/chat/conversations/{id}/messages', [ChatController::class, 'sendMessage'])->name('chat.send');
+        Route::post('/chat/messages/{id}/reactions', [ChatController::class, 'addReaction'])->name('chat.reaction.add');
+        Route::delete('/chat/messages/{id}/reactions', [ChatController::class, 'removeReaction'])->name('chat.reaction.remove');
+        Route::post('/chat/conversations/{id}/participants', [ChatController::class, 'addParticipant'])->name('chat.participant.add');
+        Route::delete('/chat/conversations/{id}/participants/{userId}', [ChatController::class, 'removeParticipant'])->name('chat.participant.remove');
+        Route::post('/chat/conversations/{id}/leave', [ChatController::class, 'leave'])->name('chat.leave');
+        Route::get('/chat/users/search', [ChatController::class, 'searchUsers'])->name('chat.users.search');
+        Route::get('/chat/unread-count', [ChatController::class, 'unreadCount'])->name('chat.unread');
+    });
 });
 
 /*

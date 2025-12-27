@@ -19,6 +19,7 @@ class SettingsSeeder extends Seeder
             ['key' => 'contact_phone', 'value' => '+234 800 000 0000', 'type' => 'string', 'group' => 'general', 'description' => 'Contact phone'],
 
             // Email Settings
+            ['key' => 'email_provider', 'value' => 'smtp', 'type' => 'string', 'group' => 'email', 'description' => 'Email provider (smtp, sendgrid, mailgun, ses)'],
             ['key' => 'smtp_host', 'value' => 'smtp.mailtrap.io', 'type' => 'string', 'group' => 'email', 'description' => 'SMTP host'],
             ['key' => 'smtp_port', 'value' => '587', 'type' => 'string', 'group' => 'email', 'description' => 'SMTP port'],
             ['key' => 'smtp_username', 'value' => '', 'type' => 'string', 'group' => 'email', 'description' => 'SMTP username'],
@@ -27,11 +28,24 @@ class SettingsSeeder extends Seeder
             ['key' => 'from_email', 'value' => 'noreply@farmvax.com', 'type' => 'string', 'group' => 'email', 'description' => 'From email address'],
             ['key' => 'from_name', 'value' => 'FarmVax', 'type' => 'string', 'group' => 'email', 'description' => 'From name'],
 
+            // SendGrid Settings
+            ['key' => 'sendgrid_api_key', 'value' => '', 'type' => 'string', 'group' => 'email', 'description' => 'SendGrid API key'],
+
+            // Mailgun Settings
+            ['key' => 'mailgun_domain', 'value' => '', 'type' => 'string', 'group' => 'email', 'description' => 'Mailgun domain'],
+            ['key' => 'mailgun_api_key', 'value' => '', 'type' => 'string', 'group' => 'email', 'description' => 'Mailgun API key'],
+
+            // Amazon SES Settings
+            ['key' => 'ses_key', 'value' => '', 'type' => 'string', 'group' => 'email', 'description' => 'Amazon SES access key'],
+            ['key' => 'ses_secret', 'value' => '', 'type' => 'string', 'group' => 'email', 'description' => 'Amazon SES secret key'],
+            ['key' => 'ses_region', 'value' => 'us-east-1', 'type' => 'string', 'group' => 'email', 'description' => 'Amazon SES region'],
+
             // SMS Settings
-            ['key' => 'sms_provider', 'value' => 'twilio', 'type' => 'string', 'group' => 'sms', 'description' => 'SMS provider'],
+            ['key' => 'sms_provider', 'value' => 'twilio', 'type' => 'string', 'group' => 'sms', 'description' => 'SMS provider (twilio, kudi, termii, africastalking, bulksms)'],
             ['key' => 'sms_api_key', 'value' => '', 'type' => 'string', 'group' => 'sms', 'description' => 'SMS API key'],
             ['key' => 'sms_api_secret', 'value' => '', 'type' => 'string', 'group' => 'sms', 'description' => 'SMS API secret'],
-            ['key' => 'sms_from_number', 'value' => '', 'type' => 'string', 'group' => 'sms', 'description' => 'SMS from number'],
+            ['key' => 'sms_sender_id', 'value' => 'FarmVax', 'type' => 'string', 'group' => 'sms', 'description' => 'SMS sender ID'],
+            ['key' => 'sms_from_number', 'value' => '', 'type' => 'string', 'group' => 'sms', 'description' => 'SMS from number (for Twilio)'],
 
             // AI Settings
             ['key' => 'ai_enabled', 'value' => '0', 'type' => 'boolean', 'group' => 'ai', 'description' => 'Enable AI chatbot'],
