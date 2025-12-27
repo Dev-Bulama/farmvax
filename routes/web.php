@@ -1,4 +1,3 @@
-use App\Http\Controllers\Api\AiChatController;
 <?php
 
 use Illuminate\Support\Facades\Route;
@@ -15,6 +14,7 @@ use App\Http\Controllers\Volunteer\DashboardController as VolunteerDashboardCont
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Api\LocationController;
 use App\Http\Controllers\ChatController;
+use App\Http\Controllers\Api\AiChatController;
 
 /*
 |--------------------------------------------------------------------------

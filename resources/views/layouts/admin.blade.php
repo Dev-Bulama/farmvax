@@ -233,9 +233,6 @@
 
     </div>
 
-    <!-- Chat Bubble Widget -->
-    @include('components.chat-bubble')
-
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const sidebar = document.getElementById('sidebar');

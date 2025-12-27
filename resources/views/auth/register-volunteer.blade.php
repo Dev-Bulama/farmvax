@@ -95,14 +95,59 @@
                         <label for="address" class="block text-sm font-medium text-gray-700">
                             Address <span class="text-red-500">*</span>
                         </label>
-                        <textarea 
-                            name="address" 
-                            id="address" 
+                        <textarea
+                            name="address"
+                            id="address"
                             rows="2"
                             required
                             class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-green focus:border-brand-green"
-                            placeholder="Address, LGA, State"
+                            placeholder="Street address, village name"
                         >{{ old('address') }}</textarea>
+                    </div>
+
+                    <!-- Country -->
+                    <div>
+                        <label for="country_id" class="block text-sm font-medium text-gray-700">
+                            Country <span class="text-red-500">*</span>
+                        </label>
+                        <select
+                            name="country_id"
+                            id="country_id"
+                            required
+                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-green focus:border-brand-green"
+                        >
+                            <option value="">Select Country</option>
+                        </select>
+                    </div>
+
+                    <!-- State -->
+                    <div>
+                        <label for="state_id" class="block text-sm font-medium text-gray-700">
+                            State <span class="text-red-500">*</span>
+                        </label>
+                        <select
+                            name="state_id"
+                            id="state_id"
+                            required
+                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-green focus:border-brand-green"
+                        >
+                            <option value="">Select State</option>
+                        </select>
+                    </div>
+
+                    <!-- LGA -->
+                    <div>
+                        <label for="lga_id" class="block text-sm font-medium text-gray-700">
+                            Local Government Area <span class="text-red-500">*</span>
+                        </label>
+                        <select
+                            name="lga_id"
+                            id="lga_id"
+                            required
+                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-green focus:border-brand-green"
+                        >
+                            <option value="">Select LGA</option>
+                        </select>
                     </div>
 
                     <!-- Organization (Optional) -->
@@ -257,5 +302,73 @@
     </div>
 
     <script src="{{ asset('js/farmvax-mobile.js') }}"></script>
+
+    <!-- Cascading Location Dropdowns Script -->
+    <script>
+        // Load countries on page load
+        fetch('/api/countries')
+            .then(response => response.json())
+            .then(data => {
+                const countrySelect = document.getElementById('country_id');
+                data.forEach(country => {
+                    const option = document.createElement('option');
+                    option.value = country.id;
+                    option.textContent = country.name;
+                    countrySelect.appendChild(option);
+                });
+            })
+            .catch(error => console.error('Error loading countries:', error));
+
+        // Load states when country changes
+        document.getElementById('country_id').addEventListener('change', function() {
+            const countryId = this.value;
+            const stateSelect = document.getElementById('state_id');
+            const lgaSelect = document.getElementById('lga_id');
+
+            // Reset dependent dropdowns
+            stateSelect.innerHTML = '<option value="">Select State</option>';
+            lgaSelect.innerHTML = '<option value="">Select LGA</option>';
+
+            if (countryId) {
+                fetch(`/api/states/${countryId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        data.forEach(state => {
+                            const option = document.createElement('option');
+                            option.value = state.id;
+                            option.textContent = state.name;
+                            stateSelect.appendChild(option);
+                        });
+                    })
+                    .catch(error => console.error('Error loading states:', error));
+            }
+        });
+
+        // Load LGAs when state changes
+        document.getElementById('state_id').addEventListener('change', function() {
+            const stateId = this.value;
+            const lgaSelect = document.getElementById('lga_id');
+
+            // Reset LGA dropdown
+            lgaSelect.innerHTML = '<option value="">Select LGA</option>';
+
+            if (stateId) {
+                fetch(`/api/lgas/${stateId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        data.forEach(lga => {
+                            const option = document.createElement('option');
+                            option.value = lga.id;
+                            option.textContent = lga.name;
+                            lgaSelect.appendChild(option);
+                        });
+                    })
+                    .catch(error => console.error('Error loading LGAs:', error));
+            }
+        });
+    </script>
+
+    <!-- Chat Bubble Widget -->
+    @include('components.chat-bubble')
 </body>
 </html>
