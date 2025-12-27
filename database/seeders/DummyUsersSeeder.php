@@ -100,69 +100,81 @@ class DummyUsersSeeder extends Seeder
 
         $professionalsData = [
             [
-                'name' => 'Dr. Ahmed Suleiman',
-                'email' => 'professional1@farmvax.com',
-                'phone' => '+2348044444444',
-                'password' => Hash::make('professional123'),
-                'role' => 'animal_health_professional',
-                'address' => '56 Medical Center, Kano',
-                'state_id' => $kanoState?->id,
-                'lga_id' => $kanoLga?->id,
-                'latitude' => 12.0000,
-                'longitude' => 8.5200,
-                'account_status' => 'active',
-                'status' => 'active',
-                'license_number' => 'VET/KN/001/2020',
-                'years_experience' => 8,
-                'verification_status' => 'approved'
+                'user' => [
+                    'name' => 'Dr. Ahmed Suleiman',
+                    'email' => 'professional1@farmvax.com',
+                    'phone' => '+2348044444444',
+                    'password' => Hash::make('professional123'),
+                    'role' => 'animal_health_professional',
+                    'address' => '56 Medical Center, Kano',
+                    'state_id' => $kanoState?->id,
+                    'lga_id' => $kanoLga?->id,
+                    'latitude' => 12.0000,
+                    'longitude' => 8.5200,
+                    'account_status' => 'active',
+                    'status' => 'active'
+                ],
+                'professional' => [
+                    'license_number' => 'VET/KN/001/2020',
+                    'years_experience' => 8,
+                    'verification_status' => 'approved'
+                ]
             ],
             [
-                'name' => 'Dr. Ngozi Okafor',
-                'email' => 'professional2@farmvax.com',
-                'phone' => '+2348055555555',
-                'password' => Hash::make('professional123'),
-                'role' => 'animal_health_professional',
-                'address' => '90 Clinic Road, Lagos',
-                'state_id' => $lagosState?->id,
-                'lga_id' => $lagosLga?->id,
-                'latitude' => 6.5000,
-                'longitude' => 3.3500,
-                'account_status' => 'active',
-                'status' => 'active',
-                'license_number' => 'VET/LA/002/2019',
-                'years_experience' => 12,
-                'verification_status' => 'approved'
+                'user' => [
+                    'name' => 'Dr. Ngozi Okafor',
+                    'email' => 'professional2@farmvax.com',
+                    'phone' => '+2348055555555',
+                    'password' => Hash::make('professional123'),
+                    'role' => 'animal_health_professional',
+                    'address' => '90 Clinic Road, Lagos',
+                    'state_id' => $lagosState?->id,
+                    'lga_id' => $lagosLga?->id,
+                    'latitude' => 6.5000,
+                    'longitude' => 3.3500,
+                    'account_status' => 'active',
+                    'status' => 'active'
+                ],
+                'professional' => [
+                    'license_number' => 'VET/LA/002/2019',
+                    'years_experience' => 12,
+                    'verification_status' => 'approved'
+                ]
             ],
             [
-                'name' => 'Dr. Yusuf Garba',
-                'email' => 'professional3@farmvax.com',
-                'phone' => '+2348066666666',
-                'password' => Hash::make('professional123'),
-                'role' => 'animal_health_professional',
-                'address' => '23 Health Center, Abuja',
-                'state_id' => $abujaState?->id,
-                'lga_id' => $abujaLga?->id,
-                'latitude' => 9.0500,
-                'longitude' => 7.3800,
-                'account_status' => 'active',
-                'status' => 'pending',
-                'license_number' => 'VET/AB/003/2021',
-                'years_experience' => 5,
-                'verification_status' => 'pending'
+                'user' => [
+                    'name' => 'Dr. Yusuf Garba',
+                    'email' => 'professional3@farmvax.com',
+                    'phone' => '+2348066666666',
+                    'password' => Hash::make('professional123'),
+                    'role' => 'animal_health_professional',
+                    'address' => '23 Health Center, Abuja',
+                    'state_id' => $abujaState?->id,
+                    'lga_id' => $abujaLga?->id,
+                    'latitude' => 9.0500,
+                    'longitude' => 7.3800,
+                    'account_status' => 'active',
+                    'status' => 'active'
+                ],
+                'professional' => [
+                    'license_number' => 'VET/AB/003/2021',
+                    'years_experience' => 5,
+                    'verification_status' => 'pending'
+                ]
             ]
         ];
 
         foreach ($professionalsData as $profData) {
-            $user = User::create($profData);
+            $user = User::create($profData['user']);
 
             // Create professional profile
             AnimalHealthProfessional::create([
                 'user_id' => $user->id,
-                'license_number' => $profData['license_number'],
+                'license_number' => $profData['professional']['license_number'],
                 'specialization' => 'General Practice',
-                'years_of_experience' => $profData['years_experience'],
+                'years_of_experience' => $profData['professional']['years_experience'],
                 'qualification' => 'DVM',
-                'verification_status' => $profData['verification_status'],
+                'verification_status' => $profData['professional']['verification_status'],
                 'professional_type_id' => $professionalType?->id,
                 'specialization_id' => $specialization?->id,
                 'service_area_id' => $serviceArea?->id,
