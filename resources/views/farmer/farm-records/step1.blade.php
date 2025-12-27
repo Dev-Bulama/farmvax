@@ -114,59 +114,48 @@
                             >{{ old('farmer_address', session('farm_record_step1.farmer_address', auth()->user()->address)) }}</textarea>
                         </div>
 
-                        <!-- City, State, LGA -->
+                        <!-- Country, State, LGA -->
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                             <div>
-                                <label for="farmer_city" class="block text-sm font-medium text-gray-700 mb-2">
-                                    City/Town <span class="text-red-500">*</span>
+                                <label for="country_id" class="block text-sm font-medium text-gray-700 mb-2">
+                                    Country <span class="text-red-500">*</span>
                                 </label>
-                                <input 
-                                    type="text" 
-                                    id="farmer_city" 
-                                    name="farmer_city" 
-                                    value="{{ old('farmer_city', session('farm_record_step1.farmer_city')) }}"
-                                    required
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500"
-                                    placeholder="City/Town"
-                                >
-                            </div>
-
-                            <div>
-                                <label for="farmer_state" class="block text-sm font-medium text-gray-700 mb-2">
-                                    State <span class="text-red-500">*</span>
-                                </label>
-                                <select 
-                                    id="farmer_state" 
-                                    name="farmer_state" 
+                                <select
+                                    id="country_id"
+                                    name="country_id"
                                     required
                                     class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500"
                                 >
-                                    <option value="">Select State</option>
-                                    <option value="Abia" {{ old('farmer_state', session('farm_record_step1.farmer_state')) == 'Abia' ? 'selected' : '' }}>Abia</option>
-                                    <option value="Adamawa" {{ old('farmer_state', session('farm_record_step1.farmer_state')) == 'Adamawa' ? 'selected' : '' }}>Adamawa</option>
-                                    <option value="Akwa Ibom" {{ old('farmer_state', session('farm_record_step1.farmer_state')) == 'Akwa Ibom' ? 'selected' : '' }}>Akwa Ibom</option>
-                                    <option value="Anambra" {{ old('farmer_state', session('farm_record_step1.farmer_state')) == 'Anambra' ? 'selected' : '' }}>Anambra</option>
-                                    <option value="Bauchi" {{ old('farmer_state', session('farm_record_step1.farmer_state')) == 'Bauchi' ? 'selected' : '' }}>Bauchi</option>
-                                    <option value="FCT Abuja" {{ old('farmer_state', session('farm_record_step1.farmer_state')) == 'FCT Abuja' ? 'selected' : '' }}>FCT Abuja</option>
-                                    <option value="Kaduna" {{ old('farmer_state', session('farm_record_step1.farmer_state')) == 'Kaduna' ? 'selected' : '' }}>Kaduna</option>
-                                    <option value="Kano" {{ old('farmer_state', session('farm_record_step1.farmer_state')) == 'Kano' ? 'selected' : '' }}>Kano</option>
-                                    <option value="Lagos" {{ old('farmer_state', session('farm_record_step1.farmer_state')) == 'Lagos' ? 'selected' : '' }}>Lagos</option>
-                                    <option value="Plateau" {{ old('farmer_state', session('farm_record_step1.farmer_state')) == 'Plateau' ? 'selected' : '' }}>Plateau</option>
+                                    <option value="">Select Country</option>
                                 </select>
                             </div>
 
                             <div>
-                                <label for="farmer_lga" class="block text-sm font-medium text-gray-700 mb-2">
-                                    LGA
+                                <label for="state_id" class="block text-sm font-medium text-gray-700 mb-2">
+                                    State <span class="text-red-500">*</span>
                                 </label>
-                                <input 
-                                    type="text" 
-                                    id="farmer_lga" 
-                                    name="farmer_lga" 
-                                    value="{{ old('farmer_lga', session('farm_record_step1.farmer_lga')) }}"
+                                <select
+                                    id="state_id"
+                                    name="state_id"
+                                    required
                                     class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500"
-                                    placeholder="Local Government Area"
                                 >
+                                    <option value="">Select State</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label for="lga_id" class="block text-sm font-medium text-gray-700 mb-2">
+                                    Local Government Area <span class="text-red-500">*</span>
+                                </label>
+                                <select
+                                    id="lga_id"
+                                    name="lga_id"
+                                    required
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500"
+                                >
+                                    <option value="">Select LGA</option>
+                                </select>
                             </div>
                         </div>
 
@@ -292,6 +281,69 @@ document.addEventListener('DOMContentLoaded', function() {
             menuCloseIcon.classList.add('hidden');
         });
     }
+
+    // Cascading Location Dropdowns
+    const countrySelect = document.getElementById('country_id');
+    const stateSelect = document.getElementById('state_id');
+    const lgaSelect = document.getElementById('lga_id');
+
+    // Load countries on page load
+    fetch('/api/countries')
+        .then(response => response.json())
+        .then(data => {
+            data.forEach(country => {
+                const option = document.createElement('option');
+                option.value = country.id;
+                option.textContent = country.name;
+                countrySelect.appendChild(option);
+            });
+        })
+        .catch(error => console.error('Error loading countries:', error));
+
+    // Load states when country changes
+    countrySelect.addEventListener('change', function() {
+        const countryId = this.value;
+
+        // Reset dependent dropdowns
+        stateSelect.innerHTML = '<option value="">Select State</option>';
+        lgaSelect.innerHTML = '<option value="">Select LGA</option>';
+
+        if (countryId) {
+            fetch(`/api/states/${countryId}`)
+                .then(response => response.json())
+                .then(data => {
+                    data.forEach(state => {
+                        const option = document.createElement('option');
+                        option.value = state.id;
+                        option.textContent = state.name;
+                        stateSelect.appendChild(option);
+                    });
+                })
+                .catch(error => console.error('Error loading states:', error));
+        }
+    });
+
+    // Load LGAs when state changes
+    stateSelect.addEventListener('change', function() {
+        const stateId = this.value;
+
+        // Reset LGA dropdown
+        lgaSelect.innerHTML = '<option value="">Select LGA</option>';
+
+        if (stateId) {
+            fetch(`/api/lgas/${stateId}`)
+                .then(response => response.json())
+                .then(data => {
+                    data.forEach(lga => {
+                        const option = document.createElement('option');
+                        option.value = lga.id;
+                        option.textContent = lga.name;
+                        lgaSelect.appendChild(option);
+                    });
+                })
+                .catch(error => console.error('Error loading LGAs:', error));
+        }
+    });
 });
 </script>
 
