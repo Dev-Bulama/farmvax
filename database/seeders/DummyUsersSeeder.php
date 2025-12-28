@@ -170,14 +170,11 @@ class DummyUsersSeeder extends Seeder
             // Create professional profile
             AnimalHealthProfessional::create([
                 'user_id' => $user->id,
+                'professional_type' => 'veterinarian',
                 'license_number' => $profData['professional']['license_number'],
                 'specialization' => 'General Practice',
-                'years_of_experience' => $profData['professional']['years_experience'],
-                'qualification' => 'DVM',
-                'verification_status' => $profData['professional']['verification_status'],
-                'professional_type_id' => $professionalType?->id,
-                'specialization_id' => $specialization?->id,
-                'service_area_id' => $serviceArea?->id,
+                'experience_years' => $profData['professional']['years_experience'],
+                'approval_status' => $profData['professional']['verification_status'],
             ]);
         }
 
